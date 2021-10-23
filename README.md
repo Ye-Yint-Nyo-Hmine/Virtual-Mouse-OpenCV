@@ -1,5 +1,12 @@
 # Virtual-Mouse-OpenCV
 
+DEMO
+
+<video width="960" controls>
+  <source src="Virtual Mouse-controlling-vid" type="video/mp4">
+  Your browser does not support HTML video.
+</video>
+
 This program helps you to control and click your mouse by not touching any keys!!
 Just like in Iron Man, Tony Stark uses his hand to control things virtually.
 It do the same thing with your mouse.
