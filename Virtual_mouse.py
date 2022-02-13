@@ -4,6 +4,7 @@ import time
 import math
 import numpy as np
 import pyautogui
+from threading import Thread
 
 cap = cv2.VideoCapture(0)
 
@@ -25,20 +26,28 @@ cTime = 0
 looper = []
 
 
-def landmarks(hand_landmarks):
+def landmarks(hand_landmarks=None):
     mpDraw.draw_landmarks(frame, hand_landmarks, mpHands.HAND_CONNECTIONS)
-    differ_x = abs(middle_finger[0] * 2 - middle_finger_l[0] * 2)  # less than 30 then, close together
-    differ_y = abs(middle_finger[1] * 2 - middle_finger_l[1] * 2)  # less than 50
+    return looper
 
-    if differ_x >= 30:
-        if differ_y >= 250:
-            pyautogui.click(index_finger[0] * 2, index_finger[1] * 2)
+
+def move_pointer():
+    global index_finger
 
     if index_finger[0] * 2 <= 1918 and index_finger[0] * 2 >= 2:
         if index_finger[1] * 2 <= 1078 and index_finger[1] * 2 >= 2:
             pyautogui.moveTo(index_finger[0] * 2, index_finger[1] * 2)
 
-    return looper
+
+def click_cursor():
+    global middle_finger
+
+    differ_x = abs(middle_finger[0] * 2 - middle_finger_l[0] * 2)  # less than 30 then, close together
+    differ_y = abs(middle_finger[1] * 2 - middle_finger_l[1] * 2)  # less than 50
+
+    if differ_x >= 30:
+        if differ_y >= 250:
+            pyautogui.doubleClick(index_finger[0] * 2, index_finger[1] * 2)
 
 
 while True:
@@ -47,6 +56,7 @@ while True:
 
     imgRGB = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
     results = hands.process(imgRGB)
+
 
     if results.multi_hand_landmarks:
         # specific points to be using for calculation
@@ -71,6 +81,10 @@ while True:
                 int(results.multi_hand_landmarks[0].landmark[mpHands.HandLandmark.WRIST].y * height)
 
         looper = [landmarks(hand_landmarks) for hand_landmarks in results.multi_hand_landmarks]
+
+        Thread(target=move_pointer).start()
+        Thread(target=click_cursor).start()
+
 
     cTime = time.time()
     fps = 1 / (cTime - pTime)
